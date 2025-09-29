@@ -1,45 +1,39 @@
 from data.repository.OpenAIRepository import OpenAIRepository
 from data.model.ExpenseData import ExpenseData
-import os
-from openai import OpenAI
-
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
+from config.securityprompt import extract_expenses
 
 class OpenAIService(OpenAIRepository):
     @staticmethod
     def insert_expense_db(user_input, user_id):
         data = []
-        prompt = (
-            f"Extraia os gastos da seguinte frase: '{user_input}'.\n"
-            "Para cada gasto, retorne em uma linha separada no formato:\n"
-            "Categoria: Valor\n"
-            "- Apenas categorias e valores.\n"
-            "- Use ponto como separador decimal.\n"
-            "- Não inclua palavras extras.\n"
-            "- Exemplo de saída:\n"
-            "Alimentação: 2.50\n"
-            "Bebidas: 1.50"
-        )
-        response = client.responses.create(
-            model="gpt-4o-mini",
-            input=prompt,
-            max_output_tokens=60
-        )
+        response = extract_expenses(user_input)
+        output_text = getattr(response, "output_text", "") or ""
 
-        output_text = response.output_text
+        if not output_text.strip():
+            return [{"mensagem": "Nenhum gasto identificado na frase."}]
+
         for line in output_text.split("\n"):
             if ":" in line:
                 categoria, valor = line.split(":", 1)
                 categoria = categoria.strip()
-                valor = float(valor.strip().replace(",", "."))
+                try:
+                    valor = float(valor.strip().replace(",", "."))
+                except ValueError:
+                    continue  # ignora linhas inválidas
                 expense = ExpenseData(categoria, valor, user_id)
-                data.append({"categoria": expense.categoria, "valor": expense.valor})
+                data.append({
+                    "categoria": expense.categoria,
+                    "valor": expense.valor
+                })
+
+        if not data:
+            return [{"mensagem": "Nenhum gasto identificado na frase."}]
 
         for item in data:
             category = item["categoria"]
             value = item["valor"]
             OpenAIRepository.insert_expense_db(category, value, user_id)
+
         return data
 
     @staticmethod

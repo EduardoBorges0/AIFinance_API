@@ -17,11 +17,33 @@ class AuthRepository:
     def get_user_by_email(email: str):
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id, name, email, password FROM users WHERE email = %s", (email,))
         row = cur.fetchone()
-        if row is None:
-            return None
-        else:
-            return row
         cur.close()
         conn.close()
+        if row is None:
+            return None
+        return {
+            "id": row[0],
+            "name": row[1],
+            "email": row[2],
+            "password": row[3]
+        }
+
+    @staticmethod
+    def get_user_by_id(user_id: int):
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT id, name, email, password FROM users WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if row:
+            return {
+                "id": row[0],
+                "name": row[1],
+                "email": row[2],
+                "password": row[3],
+            }
+        return None
