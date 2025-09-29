@@ -7,33 +7,24 @@ class OpenAIService(OpenAIRepository):
     def insert_expense_db(user_input, user_id):
         data = []
         response = extract_expenses(user_input)
-        output_text = getattr(response, "output_text", "") or ""
-
-        if not output_text.strip():
+        print(response)
+        if not response:
             return [{"mensagem": "Nenhum gasto identificado na frase."}]
 
-        for line in output_text.split("\n"):
-            if ":" in line:
-                categoria, valor = line.split(":", 1)
-                categoria = categoria.strip()
-                try:
-                    valor = float(valor.strip().replace(",", "."))
-                except ValueError:
-                    continue  # ignora linhas inválidas
-                expense = ExpenseData(categoria, valor, user_id)
-                data.append({
-                    "categoria": expense.categoria,
-                    "valor": expense.valor
-                })
-
-        if not data:
-            return [{"mensagem": "Nenhum gasto identificado na frase."}]
-
-        for item in data:
-            category = item["categoria"]
-            value = item["valor"]
+        # Itera e salva cada item
+        for item in response:
+            category = item.get("category")
+            value = item.get("value")
+            try:
+                value = float(str(value).replace(",", "."))
+            except (ValueError, TypeError):
+                continue
             OpenAIRepository.insert_expense_db(category, value, user_id)
+            data.append({"categoria": category, "valor": value})
+        if not data:
+            return [{"mensagem": "Nenhum gasto válido para salvar."}]
 
+        print(data)
         return data
 
     @staticmethod
