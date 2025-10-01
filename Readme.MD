@@ -15,9 +15,18 @@ Funcionalidades principais:
    - Python ≥ 3.11 (para desenvolvimento local)
 
 ### 2. Arquivo .env
-   - Crie um arquivo .env direto na pasta raíz, nesse arquivo terá:
+   - Crie um arquivo .env direto na pasta raíz, junto ao docker-compose.yml, nesse arquivo terá:
    ```bash
    OPENAI_API_KEY= Sua chave API da OpenAI
+   ```
+### 3. Arquivo .env.postgresql
+   - Crie um arquivo .env.postgresql para ter os parâmetros para se conectar ao banco de dados PostgreSQL, junto ao docker-compose.yml.
+   ```bash
+    DB_HOST=
+    DB_PORT=
+    DB_USER=
+    DB_PASSWORD=
+    DB_NAME=
    ```
 
 ### 3. Build e start dos containers
@@ -26,10 +35,7 @@ Funcionalidades principais:
   docker-compose up --build
   ```
   Isso fará:
-
-   - Baixar a imagem do PostgreSQL (se não estiver local)
-   - Construir a imagem da sua API
-   - Iniciar os containers de db e api
+   - Criara e iniciará o container finance_api
 
 ## 4. Acessando a API
    - A API estará disponível em: http://localhost:8000

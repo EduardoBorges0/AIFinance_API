@@ -2,12 +2,18 @@ import psycopg
 import os
 
 def get_connection():
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT")
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASSWORD")
+    dbname = os.getenv("DB_NAME")
+
     return psycopg.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=os.getenv("DB_PORT", "5432"),
-        user=os.getenv("DB_USER", "myuser"),
-        password=os.getenv("DB_PASSWORD", "mypassword"),
-        dbname=os.getenv("DB_NAME", "mydb")
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+        dbname=dbname
     )
 
 conn = get_connection()
