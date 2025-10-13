@@ -6,6 +6,10 @@ from auth_dependency import get_current_user
 
 router = APIRouter()
 
+@router.get("/health")
+def health():
+    return {"status": "ok"}
+
 @router.post("/login")
 def login(userLogin: UserLogin):
     return AuthService.login(userLogin)
