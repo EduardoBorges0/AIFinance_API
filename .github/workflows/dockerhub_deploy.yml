@@ -28,8 +28,9 @@ jobs:
             --build-arg DB_USER=${{ secrets.DB_USER }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             --build-arg DB_NAME=${{ secrets.DB_NAME }} \
-
-            -t $IMAGE_NAME:$IMAGE_TAG .
+            -t $IMAGE_NAME:$IMAGE_TAG \
+            .
+      
 
       - name: Run container test
         run: |
