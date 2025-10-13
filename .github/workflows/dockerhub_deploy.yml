@@ -42,8 +42,8 @@ jobs:
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e DB_NAME=${{ secrets.DB_NAME }} \
-
             $IMAGE_NAME:$IMAGE_TAG python -c "print('✅ Container OK!')"
+      
 
       - name: Push Docker image to Docker Hub
         if: github.ref == 'refs/heads/main' && success()
